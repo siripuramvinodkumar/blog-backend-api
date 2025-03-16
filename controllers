@@ -1,0 +1,192 @@
+1. controllers/ (Directory)
+
+controllers/:
+controllers: Refers to the logic that handles requests and responses for your API endpoints.
+/: Indicates a directory.
+Purpose: This directory holds files that contain the business logic for your API routes. It separates the route definitions from the actual request handling, making the code more organized and maintainable.
+2. authController.js (File)
+
+authController.js:
+authController: Refers to the controller for authentication-related logic (e.g., user registration, login).
+.js: JavaScript file extension.
+Purpose: This file contains the functions that handle user authentication requests.
+Code (Example - Mongoose with MongoDB):
+JavaScript
+
+// controllers/authController.js
+
+// 1. Import necessary modules.
+const User = require('../models/user');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+
+// 2. Define the register function.
+exports.register = async (req, res) => {
+    try {
+        // 3. Extract user data from the request body.
+        const { username, email, password } = req.body;
+
+        // 4. Check if the user already exists.
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ message: 'User already exists' });
+        }
+
+        // 5. Create a new user.
+        const user = new User({ username, email, password });
+        await user.save();
+
+        // 6. Respond with a success message.
+        res.status(201).json({ message: 'User registered successfully' });
+    } catch (error) {
+        // 7. Handle errors.
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+// 8. Define the login function.
+exports.login = async (req, res) => {
+    try {
+        // 9. Extract user credentials from the request body.
+        const { email, password } = req.body;
+
+        // 10. Find the user by email.
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        // 11. Compare passwords.
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        // 12. Generate a JWT token.
+        const token = jwt.sign({ userId: user._id }, 'your_secret_key', { expiresIn: '1h' });
+
+        // 13. Respond with the token.
+        res.status(200).json({ token });
+    } catch (error) {
+        // 14. Handle errors.
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+Explanation:
+Step 1: Imports the User model, JWT library, and bcrypt library.
+Step 2: Defines the register function.
+Step 3: Extracts user data from the request body.
+Step 4: Checks if the user already exists.
+Step 5: Creates a new user and saves it to the database.
+Step 6: Responds with a success message.
+Step 7: Handles errors.
+Step 8: Defines the login function.
+Step 9: Extracts user credentials from the request body.
+Step 10: Finds the user by email.
+Step 11: Compares passwords.
+Step 12: Generates a JWT token.
+Step 13: Responds with the token.
+Step 14: Handles errors.
+3. postController.js (File)
+
+postController.js:
+postController: Refers to the controller for blog post-related logic (e.g., create, read, update, delete posts).
+.js: JavaScript file extension.
+Purpose: This file contains the functions that handle blog post requests.
+Code (Example - Mongoose with MongoDB):
+JavaScript
+
+// controllers/postController.js
+
+// 1. Import necessary modules.
+const Post = require('../models/post');
+
+// 2. Define the getAllPosts function.
+exports.getAllPosts = async (req, res) => {
+    try {
+        // 3. Retrieve all posts from the database.
+        const posts = await Post.find().populate('author', 'username');
+
+        // 4. Respond with the posts.
+        res.status(200).json(posts);
+    } catch (error) {
+        // 5. Handle errors.
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+// 6. Define the createPost function.
+exports.createPost = async (req, res) => {
+    try {
+        // 7. Extract post data from the request body.
+        const { title, content } = req.body;
+        const author = req.user.userId; // Assuming you have auth middleware
+
+        // 8. Create a new post.
+        const post = new Post({ title, content, author });
+        await post.save();
+
+        // 9. Respond with the created post.
+        res.status(201).json(post);
+    } catch (error) {
+        // 10. Handle errors.
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+// ... other functions (getPostById, updatePost, deletePost) ...
+Explanation:
+Step 1: Imports the Post model.
+Step 2: Defines the getAllPosts function.
+Step 3: Retrieves all posts from the database.
+Step 4: Responds with the posts.
+Step 5: Handles errors.
+Step 6: Defines the createPost function.
+Step 7: Extracts post data from the request body.
+Step 8: Creates a new post and saves it to the database.
+Step 9: Responds with the created post.
+Step 10: Handles errors.
+4. commentController.js (File)
+
+commentController.js:
+commentController: Refers to the controller for comment-related logic (e.g., create, read, update, delete comments).
+.js: JavaScript file extension.
+Purpose: This file contains the functions that handle comment requests.
+Code (Example - Mongoose with MongoDB):
+JavaScript
+
+// controllers/commentController.js
+
+// 1. Import necessary modules.
+const Comment = require('../models/comment');
+
+// 2. Define the getAllComments function.
+exports.getAllComments = async (req, res) => {
+    try {
+        // 3. Retrieve all comments from the database.
+        const comments = await Comment.find().populate('author', 'username');
+
+        // 4. Respond with the comments.
+        res.status(200).json(comments);
+    } catch (error) {
+        // 5. Handle errors.
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+// 6. Define the createComment function.
+exports.createComment = async (req, res) => {
+    try {
+        // 7. Extract comment data from the request body.
+        const { text, post } = req.body;
+        const author = req.user.userId; // Assuming you have auth middleware
+
+        // 8. Create a new comment.
+        const comment = new Comment({ text, post, author });
+        await comment.save();
+
+        // 9. Respond with the created comment.
+        res.status(201).json(comment);
+    } catch (error) {
+        // 10. Handle errors.
+        res.status(500).json({ message: 'Internal server error
