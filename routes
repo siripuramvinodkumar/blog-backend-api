@@ -1,0 +1,119 @@
+1. routes/ (Directory)
+
+routes/:
+routes: Refers to the URL routing logic of your Express.js application.
+/: Indicates a directory.
+Purpose: This directory holds files that define the API endpoints (routes) for your application. It separates routing logic from the main application file, making the code more organized and maintainable.
+2. auth.js (File)
+
+auth.js:
+auth: Refers to authentication-related routes (e.g., user registration, login).
+.js: JavaScript file extension.
+Purpose: This file defines the API endpoints for user authentication.
+Code (Example):
+JavaScript
+
+// routes/auth.js
+const express = require('express');
+const router = express.Router();
+const authController = require('../controllers/authController');
+
+// POST /api/auth/register
+router.post('/register', authController.register);
+
+// POST /api/auth/login
+router.post('/login', authController.login);
+
+module.exports = router;
+Explanation:
+const express = require('express');: Imports the Express.js library.
+const router = express.Router();: Creates a new router object.
+const authController = require('../controllers/authController');: Imports the authentication controller module.
+router.post('/register', authController.register);: Defines a POST route for user registration.
+router: The Express.js router object.
+.post(): Specifies that this route handles POST requests.
+'/register': The URL path for this route.
+authController.register: The controller function that handles the registration logic.
+router.post('/login', authController.login);: Defines a POST route for user login.
+module.exports = router;: Exports the router object so it can be used in the main application file.
+3. posts.js (File)
+
+posts.js:
+posts: Refers to routes related to blog posts.
+.js: JavaScript file extension.
+Purpose: This file defines the API endpoints for creating, reading, updating, and deleting blog posts.
+Code (Example):
+JavaScript
+
+// routes/posts.js
+const express = require('express');
+const router = express.Router();
+const postController = require('../controllers/postController');
+const authMiddleware = require('../middleware/authMiddleware');
+
+// GET /api/posts
+router.get('/', postController.getAllPosts);
+
+// GET /api/posts/:id
+router.get('/:id', postController.getPostById);
+
+// POST /api/posts
+router.post('/', authMiddleware, postController.createPost);
+
+// PUT /api/posts/:id
+router.put('/:id', authMiddleware, postController.updatePost);
+
+// DELETE /api/posts/:id
+router.delete('/:id', authMiddleware, postController.deletePost);
+
+module.exports = router;
+Explanation:
+const postController = require('../controllers/postController');: Imports the post controller module.
+const authMiddleware = require('../middleware/authMiddleware');: Imports the authentication middleware module.
+router.get('/', postController.getAllPosts);: Defines a GET route to retrieve all posts.
+router.get('/:id', postController.getPostById);: Defines a GET route to retrieve a specific post by ID.
+router.post('/', authMiddleware, postController.createPost);: Defines a POST route to create a new post.
+authMiddleware: Applies the authentication middleware to protect this route.
+router.put('/:id', authMiddleware, postController.updatePost);: Defines a PUT route to update a post.
+router.delete('/:id', authMiddleware, postController.deletePost);: Defines a DELETE route to delete a post.
+4. comments.js (File)
+
+comments.js:
+comments: Refers to routes related to comments on blog posts.
+.js: JavaScript file extension.
+Purpose: This file defines the API endpoints for creating, reading, updating, and deleting comments on blog posts.
+Code (Example):
+JavaScript
+
+// routes/comments.js
+const express = require('express');
+const router = express.Router();
+const commentController = require('../controllers/commentController');
+const authMiddleware = require('../middleware/authMiddleware');
+
+// GET /api/comments
+router.get('/', commentController.getAllComments);
+
+// GET /api/comments/:id
+router.get('/:id', commentController.getCommentById);
+
+// POST /api/comments
+router.post('/', authMiddleware, commentController.createComment);
+
+// PUT /api/comments/:id
+router.put('/:id', authMiddleware, commentController.updateComment);
+
+// DELETE /api/comments/:id
+router.delete('/:id', authMiddleware, commentController.deleteComment);
+
+module.exports = router;
+Explanation:
+const commentController = require('../controllers/commentController');: Imports the comment controller module.
+The rest of the code follows a similar pattern to posts.js, defining routes for managing comments.
+Key Points:
+
+Express.js Router: The express.Router() object is used to create modular route handlers.
+Controllers: The controller modules (e.g., authController, postController) contain the actual logic for handling requests and responses.
+Middleware: Middleware functions (e.g., authMiddleware) are used to perform tasks before or after the route handler is executed, such as authentication.
+API Endpoints: Each route defines an API endpoint, specifying the HTTP method (GET, POST, PUT, DELETE) and the URL path.
+Modular Design: Using separate route files helps keep your code organized and makes it easier to manage the API endpoints.
